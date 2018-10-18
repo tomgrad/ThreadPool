@@ -35,7 +35,6 @@ inline ThreadPool::ThreadPool(size_t threads)
                 for (;;)
                 {
                     std::packaged_task<void()> task;
-
                     {
                         std::unique_lock<std::mutex> lock(this->queue_mutex);
                         this->condition.wait(lock,
@@ -45,7 +44,6 @@ inline ThreadPool::ThreadPool(size_t threads)
                         task = std::move(this->tasks.front());
                         this->tasks.pop();
                     }
-
                     task();
                 }
             });
@@ -59,6 +57,7 @@ decltype(auto) ThreadPool::enqueue(F &&f, Args &&... args)
 
     std::packaged_task<return_type()> task(
         std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+
     std::future<return_type> res = task.get_future();
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
