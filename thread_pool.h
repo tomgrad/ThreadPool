@@ -23,7 +23,7 @@ class ThreadPool
     // need to keep track of threads so we can join them
     std::vector<std::thread> workers;
     // the task queue
-    std::queue<std::function<void()>> tasks;
+   std::queue<std::packaged_task<void()>> tasks;
 
     // synchronization
     std::mutex queue_mutex;
@@ -40,7 +40,7 @@ inline ThreadPool::ThreadPool(size_t threads)
             [this] {
                 for (;;)
                 {
-                    std::function<void()> task;
+                    std::packaged_task<void()> task;
 
                     {
                         std::unique_lock<std::mutex> lock(this->queue_mutex);
